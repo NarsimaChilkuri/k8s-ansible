@@ -1,36 +1,27 @@
 - hosts: local
   become: yes
   tasks:
-   - name: install Docker
-     apt:
-       name: docker
-       state: present
-       update_cache: true
+   - name: Add an apt signing key for Docker
+     apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+
+   - name: Add apt repository for stable version
+     apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
+      state: present
+
+   - name: Install docker and its dependecies
+     apt: 
+      name: ["docker-ce","docker-ce-cli","containerd.io"]
+      state: present
+      update_cache: yes
 
    - name: start Docker
      service:
        name: docker
        state: started
        enabled: yes
-
-   - name: disable SELinux
-     command: setenforce 0
-
-   - name: disable SELinux on reboot
-     selinux:
-       state: disabled
-
-   - name: ensure net.bridge.bridge-nf-call-ip6tables is set to 1
-     sysctl:
-      name: net.bridge.bridge-nf-call-ip6tables
-      value: 1
-      state: present
-
-   - name: ensure net.bridge.bridge-nf-call-iptables is set to 1
-     sysctl:
-      name: net.bridge.bridge-nf-call-iptables
-      value: 1
-      state: present
 
    - name: Add an apt signing key for Kubernetes
      apt_key:
@@ -64,4 +55,4 @@
      apt:
         name: kubectl
         state: present
-        allow_downgrade: yes
+

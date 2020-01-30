@@ -1,12 +1,13 @@
 - hosts: local
   become: yes
   tasks:
-   - name: install Docker
-     yum:
+
+   - name: Install docker 
+     yum: 
        name: docker
        state: present
-       update_cache: true
-
+       update_cache: yes
+   
    - name: start Docker
      service:
        name: docker
