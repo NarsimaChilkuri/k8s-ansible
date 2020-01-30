@@ -1,7 +1,6 @@
 - hosts: local
   become: yes
   tasks:
-
    - name: Install docker 
      yum: 
        name: docker
