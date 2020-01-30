@@ -1,0 +1,67 @@
+- hosts: local
+  become: yes
+  tasks:
+   - name: install Docker
+     apt:
+       name: docker
+       state: present
+       update_cache: true
+
+   - name: start Docker
+     service:
+       name: docker
+       state: started
+       enabled: yes
+
+   - name: disable SELinux
+     command: setenforce 0
+
+   - name: disable SELinux on reboot
+     selinux:
+       state: disabled
+
+   - name: ensure net.bridge.bridge-nf-call-ip6tables is set to 1
+     sysctl:
+      name: net.bridge.bridge-nf-call-ip6tables
+      value: 1
+      state: present
+
+   - name: ensure net.bridge.bridge-nf-call-iptables is set to 1
+     sysctl:
+      name: net.bridge.bridge-nf-call-iptables
+      value: 1
+      state: present
+
+   - name: Add an apt signing key for Kubernetes
+     apt_key:
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      state: present
+
+   - name: Adding apt repository for Kubernetes
+     apt_repository:
+      repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+      state: present
+      filename: kubernetes.list
+   
+   - name: install kubelet
+     apt:
+        name: kubelet
+        state: present
+        update_cache: true
+
+   - name: install kubeadm
+     apt:
+        name: kubeadm
+        state: present
+
+   - name: start kubelet
+     service:
+       name: kubelet
+       enabled: yes
+       state: started
+
+   - name: install kubectl
+     apt:
+        name: kubectl
+        state: present
+        allow_downgrade: yes

@@ -1,0 +1,24 @@
+- hosts: local
+  tasks:
+    - name: Initializing Kubernetes cluster
+      shell: kubeadm init 
+    
+    - name: Create kube directory
+      file:
+        path: $HOME/.kube
+        state: directory
+        mode: '0755'
+
+    - name: Copying Config Files
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: $HOME/.kube/config
+    
+    - name: Changing User Permissions for config file
+      shell: sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+    - name: Install Network Add-on
+      command: kubectl apply -f https://docs.projectcalico.org/v3.9/manifests/calico.yaml
+    
+    - name: Taint Master
+      command: kubectl taint nodes --all node-role.kubernetes.io/master- 
