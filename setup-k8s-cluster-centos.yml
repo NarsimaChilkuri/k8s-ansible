@@ -1,4 +1,0 @@
----
-- import_playbook: playbooks/kube-dependencies-centos.yml
-- import_playbook: playbooks/disable-swap.yml
-- import_playbook: playbooks/setup-kube.yml
