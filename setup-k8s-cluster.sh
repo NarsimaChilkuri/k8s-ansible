@@ -31,6 +31,4 @@
     vagrant ssh k8s-master
   else  
     echo 'WARN: Could not detect distro or distro unsupported'
-    echo 'WARN: Trying to install ansible via pip without some dependencies'
-    echo 'WARN: Not all functionality of ansible may be available'
   fi
