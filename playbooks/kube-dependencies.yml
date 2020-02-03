@@ -1,0 +1,124 @@
+- hosts: local
+  become: yes
+  tasks:
+   - name: Add an apt signing key for Docker
+     apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+     when: (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
+
+   - name: Add apt repository for stable version
+     apt_repository:
+      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
+      state: present
+     when: (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
+
+   - name: Install docker and its dependecies
+     apt:
+      name: ["docker-ce","docker-ce-cli","containerd.io"]
+      state: present
+      update_cache: yes
+     when: (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")    
+ 
+   - name: Install docker 
+     yum: 
+       name: docker
+       state: present
+       update_cache: yes
+     when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat")    
+  
+   - name: start Docker
+     service:
+       name: docker
+       state: started
+       enabled: yes
+
+   - name: disable SELinux
+     command: setenforce 0
+     when: ((ansible_distribution == "CentOS") or (ansible_distribution == "RedHat")) and (ansible_selinux is defined and ansible_selinux != False and ansible_selinux.status == 'enabled')
+
+   - name: disable SELinux on reboot
+     selinux:
+       state: disabled
+     when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat")
+
+   - name: ensure net.bridge.bridge-nf-call-ip6tables is set to 1
+     sysctl:
+      name: net.bridge.bridge-nf-call-ip6tables
+      value: 1
+      state: present
+     when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat")
+
+   - name: ensure net.bridge.bridge-nf-call-iptables is set to 1
+     sysctl:
+      name: net.bridge.bridge-nf-call-iptables
+      value: 1
+      state: present
+     when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat")
+ 
+   - name: Add an apt signing key for Kubernetes
+     apt_key:
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      state: present
+     when: (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
+
+   - name: Adding apt repository for Kubernetes
+     apt_repository:
+      repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+      state: present
+      filename: kubernetes.list
+     when: (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
+
+   - name: add Kubernetes repository
+     yum_repository:
+      name: Kubernetes
+      description: Kubernetes YUM repository
+      baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+      gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+      gpgcheck: yes
+     when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat")
+ 
+   - name: install kubelet
+     apt:
+        name: kubelet
+        state: present
+        update_cache: true
+     when: (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
+
+   - name: install kubeadm
+     apt:
+        name: kubeadm
+        state: present
+     when: (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
+
+   - name: install kubelet
+     yum:
+        name: kubelet
+        state: present
+        update_cache: true
+     when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat")
+ 
+   - name: install kubeadm
+     yum:
+        name: kubeadm
+        state: present
+     when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat")
+
+   - name: start kubelet
+     service:
+       name: kubelet
+       enabled: yes
+       state: started
+   
+   - name: install kubectl
+     apt:
+        name: kubectl
+        state: present
+     when: (ansible_distribution == "Ubuntu") or (ansible_distribution == "Debian")
+
+   - name: install kubectl
+     yum:
+        name: kubectl
+        state: present
+        allow_downgrade: yes
+     when: (ansible_distribution == "CentOS") or (ansible_distribution == "RedHat")
