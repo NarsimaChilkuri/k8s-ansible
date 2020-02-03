@@ -1,4 +1,5 @@
-- hosts: local
+- hosts: all
+  become: yes
   tasks:
     - name: Initializing Kubernetes cluster
       shell: kubeadm init 
@@ -13,6 +14,8 @@
       copy:
         src: /etc/kubernetes/admin.conf
         dest: $HOME/.kube/config
+        remote_src: yes
+        mode: 0640
     
     - name: Changing User Permissions for config file
       shell: sudo chown $(id -u):$(id -g) $HOME/.kube/config

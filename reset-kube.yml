@@ -1,4 +1,4 @@
-- hosts: local
+- hosts: all
   tasks:
     - name: Reset Kubernetes Cluster
       shell: kubeadm reset --force
