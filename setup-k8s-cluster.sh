@@ -1,7 +1,7 @@
 #!/bin/sh
 
 
-  if [ -f /etc/centos-release ] || [ -f /etc/redhat-release ] || [ -f /etc/oracle-release ] || [ -f /etc/system-release ] || grep -q 'Amazon Linux' /etc/system-release; then
+  if [ -f /etc/redhat-release ]; then
     yum update
     echo "--------- INSTALLING VIRTUALBOX ----------"
     sudo yum install –y patch gcc kernel-headers kernel-devel make perl wget
@@ -14,7 +14,7 @@
     sudo yum install ansible
     vagrant up
     vagrant ssh k8s-master
-  elif [ -f /etc/debian_version ] || [ grep -qi ubuntu /etc/lsb-release ] || grep -qi ubuntu /etc/os-release; then
+  elif [ -f /etc/lsb-release ]; then
     apt-get update
     echo "--------- INSTALLING VIRTUALBOX ----------"
     sudo apt install virtualbox
