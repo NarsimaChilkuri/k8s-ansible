@@ -2,3 +2,4 @@
 - import_playbook: playbooks/kube-dependencies.yml
 - import_playbook: playbooks/disable-swap.yml
 - import_playbook: playbooks/setup-kube.yml
+- import_playbook: playbooks/setup-nginx-ingress.yml
